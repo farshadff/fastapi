@@ -1,17 +1,6 @@
 import json
-import time
-from datetime import datetime
-
-from fastapi import FastAPI, UploadFile
-from pydantic import BaseModel
-from typing import Any
-from models import ServiceResult
-import base64
+from fastapi import Request
 import requests
-from database import database
-import time
-from datetime import datetime
-
 from fastapi import UploadFile, APIRouter
 from pydantic import BaseModel
 from typing import Any
@@ -21,7 +10,6 @@ import base64
 from database import database
 
 router = APIRouter()
-
 
 
 class ServiceResultCreate(BaseModel):
@@ -37,25 +25,29 @@ async def read_file_as_base64(file: UploadFile) -> str:
 
 
 # @app.post("/process_audio/")
-async def process_audio_file(file: UploadFile, db: AsyncSession):
+async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str):
     file_base64 = await read_file_as_base64(file)
-
     url = "https://apis.languageconfidence.ai/speech-assessment/unscripted/us"
     payload = {
         "audio_format": "mp3",
         "user_metadata": {
-            "speaker_gender": "male",
-            "speaker_age": "child"
+            "speaker_gender": speaker_gender,
+            "speaker_age": speaker_age
+        },
+        "context": {
+            "question": "test",
+            "context_description": "test description"
         },
         "audio_base64": file_base64
     }
     headers = {
         "accept": "application/json",
-        "x-user-id": "1",
+        "x-user-id": x_user_id,
         "content-type": "application/json",
         "api-key": "sGXaUDCQjvLl48CHqykWmqIhPLmu3TiU"
     }
-
+    print(payload)
+    return 'done'
     response = requests.post(url, json=payload, headers=headers)
     result_data = response.json()
     # result_data = '{success:true}'
