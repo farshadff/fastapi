@@ -7,7 +7,7 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from models import MainResponse, Pronunciation, Fluency, Vocabulary, Grammar, Words
 import base64
-from database import database
+from database import database as db
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ async def read_file_as_base64(file: UploadFile) -> str:
 
 
 # @app.post("/process_audio/")
-async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str):
+async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str,question: str,description: str):
     file_base64 = await read_file_as_base64(file)
     url = "https://apis.languageconfidence.ai/speech-assessment/unscripted/us"
     payload = {
@@ -35,8 +35,8 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
             "speaker_age": speaker_age
         },
         "context": {
-            "question": "test",
-            "context_description": "test description"
+            "question": question,
+            "context_description": description
         },
         "audio_base64": file_base64
     }
@@ -46,8 +46,8 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         "content-type": "application/json",
         "api-key": "sGXaUDCQjvLl48CHqykWmqIhPLmu3TiU"
     }
-    print(payload)
-    return 'done'
+    # print(payload)
+    # return 'done'
     response = requests.post(url, json=payload, headers=headers)
     result_data = response.json()
     # result_data = '{success:true}'
