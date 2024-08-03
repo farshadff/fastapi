@@ -67,7 +67,7 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         overall_pronunciation_score=result_data['pronunciation'].get('overall_score'),
         tagged_transcript=result_data['fluency']['feedback'].get('tagged_transcript', ''),
         expected_text=result_data['pronunciation'].get('expected_text', ''),
-        user_id=int(x_user_id),
+        user_id=x_user_id,
         question=question,
         description=description,
 

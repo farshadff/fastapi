@@ -30,7 +30,7 @@ class MainResponse(Base):
     overall_pronunciation_score = Column(Float)
     tagged_transcript = Column(Text)
     expected_text = Column(Text)
-    user_id = Column(Integer)
+    user_id = Column(Text)
     question = Column(Text)
     description = Column(Text)
 
