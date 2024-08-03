@@ -69,6 +69,7 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         expected_text=result_data['pronunciation'].get('expected_text', ''),
         user_id=int(x_user_id),
         question=question,
+        description=description,
 
     )
 

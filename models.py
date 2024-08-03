@@ -32,7 +32,7 @@ class MainResponse(Base):
     expected_text = Column(Text)
     user_id = Column(Integer)
     question = Column(Text)
-    question = Column(Text)
+    description = Column(Text)
 
     # Relationships
     pronunciation = relationship("Pronunciation", back_populates="main_response", cascade="all, delete-orphan")
