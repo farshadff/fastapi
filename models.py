@@ -30,6 +30,9 @@ class MainResponse(Base):
     overall_pronunciation_score = Column(Float)
     tagged_transcript = Column(Text)
     expected_text = Column(Text)
+    user_id = Column(Integer)
+    question = Column(Text)
+    question = Column(Text)
 
     # Relationships
     pronunciation = relationship("Pronunciation", back_populates="main_response", cascade="all, delete-orphan")
