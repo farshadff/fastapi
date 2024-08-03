@@ -25,7 +25,7 @@ async def read_file_as_base64(file: UploadFile) -> str:
 
 
 # @app.post("/process_audio/")
-async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str,question: str,description: str):
+async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str,question: str,description: str,db: AsyncSession):
     file_base64 = await read_file_as_base64(file)
     url = "https://apis.languageconfidence.ai/speech-assessment/unscripted/us"
     payload = {

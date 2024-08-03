@@ -13,7 +13,8 @@ async def upload_audio(
     speaker_age: str = Form("speaker_age"),
     question: str = Form("question"),
     description: str = Form("description"),
+    db: AsyncSession = Depends(get_db)
 
 ):
-    response = await process_audio_file(file, x_user_id, speaker_gender, speaker_age,question,description)
+    response = await process_audio_file(file, x_user_id, speaker_gender, speaker_age,question,description,db)
     return response
