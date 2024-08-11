@@ -54,7 +54,9 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     # result_data = '{success:true}'
     # Store overall response
     # result_data = MOCKED_RESPONSE_DATA
-
+    print("================================")
+    print(result_data)
+    print("================================")
     # Store overall response
     main_response = MainResponse(
         overall_score=result_data.get('overall', {}).get('overall_score', None),
