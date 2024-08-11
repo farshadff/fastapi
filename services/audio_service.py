@@ -54,9 +54,11 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     # result_data = '{success:true}'
     # Store overall response
     # result_data = MOCKED_RESPONSE_DATA
-    print("================================")
-    print(result_data)
-    print("================================")
+
+    # Check for specific error and return it
+    if 'detail' in result_data and result_data['detail'] == 'Unable to process the base64 audio':
+        return {"error": result_data['detail']}
+
     # Store overall response
     main_response = MainResponse(
         overall_score=result_data.get('overall', {}).get('overall_score', None),
