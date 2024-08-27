@@ -127,4 +127,4 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
             )
             db.add(word_entry)
 
-    return {"message": "Result stored successfully"}
+    return {"message": "Result stored successfully", "response_id": response_id}
