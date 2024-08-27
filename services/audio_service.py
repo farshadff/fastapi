@@ -25,7 +25,8 @@ async def read_file_as_base64(file: UploadFile) -> str:
 
 
 # @app.post("/process_audio/")
-async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str,question: str,description: str,db: AsyncSession):
+async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: str, speaker_age: str, question: str,
+                             description: str, db: AsyncSession):
     file_base64 = await read_file_as_base64(file)
     url = "https://apis.languageconfidence.ai/speech-assessment/unscripted/us"
     payload = {
@@ -54,23 +55,32 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     # Store overall response
     # result_data = MOCKED_RESPONSE_DATA
 
+    # Check for specific error and return it
+    if 'detail' in result_data and result_data['detail'] == 'Unable to process the base64 audio':
+        return {"error": result_data['detail']}
+
     # Store overall response
     main_response = MainResponse(
-        overall_score=result_data['overall'].get('overall_score'),
-        mock_ielts_prediction=result_data['overall']['english_proficiency_scores']['mock_ielts'].get('prediction'),
-        mock_cefr_prediction=result_data['overall']['english_proficiency_scores']['mock_cefr'].get('prediction'),
-        mock_pte_prediction=result_data['overall']['english_proficiency_scores']['mock_pte'].get('prediction'),
+        overall_score=result_data.get('overall', {}).get('overall_score', None),
+        mock_ielts_prediction=result_data.get('overall', {}).get('english_proficiency_scores', {}).get('mock_ielts',
+                                                                                                       {}).get(
+            'prediction', None),
+        mock_cefr_prediction=result_data.get('overall', {}).get('english_proficiency_scores', {}).get('mock_cefr',
+                                                                                                      {}).get(
+            'prediction', None),
+        mock_pte_prediction=result_data.get('overall', {}).get('english_proficiency_scores', {}).get('mock_pte',
+                                                                                                     {}).get(
+            'prediction', None),
         feedback_text=result_data.get('feedback', ''),
-        overall_fluency_score=result_data['fluency'].get('overall_score'),
-        overall_vocabulary_score=result_data['vocabulary'].get('overall_score'),
-        overall_grammar_score=result_data['grammar'].get('overall_score'),
-        overall_pronunciation_score=result_data['pronunciation'].get('overall_score'),
-        tagged_transcript=result_data['fluency']['feedback'].get('tagged_transcript', ''),
-        expected_text=result_data['pronunciation'].get('expected_text', ''),
+        overall_fluency_score=result_data.get('fluency', {}).get('overall_score', None),
+        overall_vocabulary_score=result_data.get('vocabulary', {}).get('overall_score', None),
+        overall_grammar_score=result_data.get('grammar', {}).get('overall_score', None),
+        overall_pronunciation_score=result_data.get('pronunciation', {}).get('overall_score', None),
+        tagged_transcript=result_data.get('fluency', {}).get('feedback', {}).get('tagged_transcript', None),
+        expected_text=result_data.get('pronunciation', {}).get('expected_text', None),
         user_id=x_user_id,
         question=question,
         description=description,
-
     )
 
     async with db.begin():
@@ -82,38 +92,39 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         # Store pronunciation details
         pronunciation = Pronunciation(
             response_id=response_id,
-            overall_score=result_data['pronunciation'].get('overall_score'),
-            lowest_scoring_phonemes=result_data['pronunciation'].get('lowest_scoring_phonemes')
+            overall_score=result_data.get('pronunciation', {}).get('overall_score', None),
+            lowest_scoring_phonemes=result_data.get('pronunciation', {}).get('lowest_scoring_phonemes', None)
         )
         db.add(pronunciation)
 
         # Store fluency details
         fluency = Fluency(
             response_id=response_id,
-            overall_score=result_data['fluency'].get('overall_score'),
-            speech_rate=result_data['fluency']['metrics'].get('speech_rate'),
-            pauses=result_data['fluency']['metrics'].get('pauses'),
-            filler_words=result_data['fluency']['metrics'].get('filler_words'),
-            feedback_text=result_data['fluency']['feedback'].get('feedback_text', ''),
-            speech_rate_over_time=result_data['fluency']['metrics'].get('speech_rate_over_time'),
-            filler_words_per_min=result_data['fluency']['metrics'].get('filler_words_per_min')
+            overall_score=result_data.get('fluency', {}).get('overall_score', None),
+            speech_rate=result_data.get('fluency', {}).get('metrics', {}).get('speech_rate', None),
+            pauses=result_data.get('fluency', {}).get('metrics', {}).get('pauses', None),
+            filler_words=result_data.get('fluency', {}).get('metrics', {}).get('filler_words', None),
+            feedback_text=result_data.get('fluency', {}).get('feedback', {}).get('feedback_text', None),
+            speech_rate_over_time=result_data.get('fluency', {}).get('metrics', {}).get('speech_rate_over_time', None),
+            filler_words_per_min=result_data.get('fluency', {}).get('metrics', {}).get('filler_words_per_min', None)
         )
         db.add(fluency)
 
         # Store vocabulary details
         vocabulary = Vocabulary(
             response_id=response_id,
-            overall_score=result_data['vocabulary'].get('overall_score'),
-            vocabulary_complexity=result_data['vocabulary']['metrics'].get('vocabulary_complexity'),
-            feedback_text=result_data['vocabulary']['feedback'].get('feedback_text', '')
+            overall_score=result_data.get('vocabulary', {}).get('overall_score', None),
+            vocabulary_complexity=result_data.get('vocabulary', {}).get('metrics', {}).get('vocabulary_complexity',
+                                                                                           None),
+            feedback_text=result_data.get('vocabulary', {}).get('feedback', {}).get('feedback_text', None)
         )
         db.add(vocabulary)
 
         # Store grammar details
         grammar = Grammar(
             response_id=response_id,
-            overall_score=result_data['grammar'].get('overall_score'),
-            feedback_text=json.dumps(result_data['grammar'].get('feedback', {}))  # Convert to JSON string
+            overall_score=result_data.get('grammar', {}).get('overall_score', None),
+            feedback_text=json.dumps(result_data.get('grammar', {}).get('feedback', {}))
         )
         db.add(grammar)
 
@@ -121,9 +132,9 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         for word in result_data['pronunciation']['words']:
             word_entry = Words(
                 response_id=response_id,
-                word_text=word.get('word_text'),
-                word_score=word.get('word_score'),
-                phoneme_data=word.get('phonemes')
+                word_text=word.get('word_text', None),
+                word_score=word.get('word_score', None),
+                phoneme_data=word.get('phonemes', None)
             )
             db.add(word_entry)
 
