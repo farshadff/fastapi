@@ -51,7 +51,7 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     # Send request to the external API
     response = requests.post(url, json=payload, headers=headers)
     result_data = response.json()
-
+    print(result_data)
     # Handle base64 processing error
     if 'detail' in result_data and result_data['detail'] == 'Unable to process the base64 audio':
         return {"error": result_data['detail']}
