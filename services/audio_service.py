@@ -47,15 +47,12 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         "content-type": "application/json",
         "api-key": "sGXaUDCQjvLl48CHqykWmqIhPLmu3TiU"
     }
-    # print(payload)
-    # return 'done'
+
+    # Send request to the external API
     response = requests.post(url, json=payload, headers=headers)
     result_data = response.json()
-    # result_data = '{success:true}'
-    # Store overall response
-    # result_data = MOCKED_RESPONSE_DATA
 
-    # Check for specific error and return it
+    # Handle base64 processing error
     if 'detail' in result_data and result_data['detail'] == 'Unable to process the base64 audio':
         return {"error": result_data['detail']}
 
@@ -86,56 +83,59 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     async with db.begin():
         db.add(main_response)
         await db.flush()  # to get the id of the inserted row
-
         response_id = main_response.id
 
-        # Store pronunciation details
-        pronunciation = Pronunciation(
-            response_id=response_id,
-            overall_score=result_data.get('pronunciation', {}).get('overall_score', None),
-            lowest_scoring_phonemes=result_data.get('pronunciation', {}).get('lowest_scoring_phonemes', None)
-        )
-        db.add(pronunciation)
-
-        # Store fluency details
-        fluency = Fluency(
-            response_id=response_id,
-            overall_score=result_data.get('fluency', {}).get('overall_score', None),
-            speech_rate=result_data.get('fluency', {}).get('metrics', {}).get('speech_rate', None),
-            pauses=result_data.get('fluency', {}).get('metrics', {}).get('pauses', None),
-            filler_words=result_data.get('fluency', {}).get('metrics', {}).get('filler_words', None),
-            feedback_text=result_data.get('fluency', {}).get('feedback', {}).get('feedback_text', None),
-            speech_rate_over_time=result_data.get('fluency', {}).get('metrics', {}).get('speech_rate_over_time', None),
-            filler_words_per_min=result_data.get('fluency', {}).get('metrics', {}).get('filler_words_per_min', None)
-        )
-        db.add(fluency)
-
-        # Store vocabulary details
-        vocabulary = Vocabulary(
-            response_id=response_id,
-            overall_score=result_data.get('vocabulary', {}).get('overall_score', None),
-            vocabulary_complexity=result_data.get('vocabulary', {}).get('metrics', {}).get('vocabulary_complexity',
-                                                                                           None),
-            feedback_text=result_data.get('vocabulary', {}).get('feedback', {}).get('feedback_text', None)
-        )
-        db.add(vocabulary)
-
-        # Store grammar details
-        grammar = Grammar(
-            response_id=response_id,
-            overall_score=result_data.get('grammar', {}).get('overall_score', None),
-            feedback_text=json.dumps(result_data.get('grammar', {}).get('feedback', {}))
-        )
-        db.add(grammar)
-
-        # Store words details
-        for word in result_data['pronunciation']['words']:
-            word_entry = Words(
+        # Store pronunciation details if they exist
+        if 'pronunciation' in result_data:
+            pronunciation = Pronunciation(
                 response_id=response_id,
-                word_text=word.get('word_text', None),
-                word_score=word.get('word_score', None),
-                phoneme_data=word.get('phonemes', None)
+                overall_score=result_data['pronunciation'].get('overall_score', None),
+                lowest_scoring_phonemes=result_data['pronunciation'].get('lowest_scoring_phonemes', None)
             )
-            db.add(word_entry)
+            db.add(pronunciation)
+
+        # Store fluency details if they exist
+        if 'fluency' in result_data:
+            fluency = Fluency(
+                response_id=response_id,
+                overall_score=result_data['fluency'].get('overall_score', None),
+                speech_rate=result_data['fluency'].get('metrics', {}).get('speech_rate', None),
+                pauses=result_data['fluency'].get('metrics', {}).get('pauses', None),
+                filler_words=result_data['fluency'].get('metrics', {}).get('filler_words', None),
+                feedback_text=result_data['fluency'].get('feedback', {}).get('feedback_text', None),
+                speech_rate_over_time=result_data['fluency'].get('metrics', {}).get('speech_rate_over_time', None),
+                filler_words_per_min=result_data['fluency'].get('metrics', {}).get('filler_words_per_min', None)
+            )
+            db.add(fluency)
+
+        # Store vocabulary details if they exist
+        if 'vocabulary' in result_data:
+            vocabulary = Vocabulary(
+                response_id=response_id,
+                overall_score=result_data['vocabulary'].get('overall_score', None),
+                vocabulary_complexity=result_data['vocabulary'].get('metrics', {}).get('vocabulary_complexity', None),
+                feedback_text=result_data['vocabulary'].get('feedback', {}).get('feedback_text', None)
+            )
+            db.add(vocabulary)
+
+        # Store grammar details if they exist
+        if 'grammar' in result_data:
+            grammar = Grammar(
+                response_id=response_id,
+                overall_score=result_data['grammar'].get('overall_score', None),
+                feedback_text=json.dumps(result_data['grammar'].get('feedback', {}))
+            )
+            db.add(grammar)
+
+        # Store word-level pronunciation details if they exist
+        if 'pronunciation' in result_data and 'words' in result_data['pronunciation']:
+            for word in result_data['pronunciation']['words']:
+                word_entry = Words(
+                    response_id=response_id,
+                    word_text=word.get('word_text', None),
+                    word_score=word.get('word_score', None),
+                    phoneme_data=word.get('phonemes', None)
+                )
+                db.add(word_entry)
 
     return {"message": "Result stored successfully", "response_id": response_id}
