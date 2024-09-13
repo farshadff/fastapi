@@ -31,10 +31,10 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
     url = "https://apis.languageconfidence.ai/speech-assessment/unscripted/us"
     payload = {
         "audio_format": "mp3",
-        "user_metadata": {
-            "speaker_gender": speaker_gender,
-            "speaker_age": speaker_age
-        },
+        # "user_metadata": {
+        #     "speaker_gender": speaker_gender,
+        #     "speaker_age": speaker_age
+        # },
         "context": {
             "question": question,
             "context_description": description
