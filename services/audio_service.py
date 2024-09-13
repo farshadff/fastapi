@@ -47,7 +47,7 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         "content-type": "application/json",
         "api-key": "sGXaUDCQjvLl48CHqykWmqIhPLmu3TiU"
     }
-
+    # return x_user_id
     # Send request to the external API
     response = requests.post(url, json=payload, headers=headers)
     result_data = response.json()
@@ -138,4 +138,4 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
                 )
                 db.add(word_entry)
 
-    return {"message": "Result stored successfully", "response_id": response_id}
+    return {"message": "Result stored successfully", "response_id": response_id,"response_datax":result_data}

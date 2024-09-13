@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/upload-audio/")
 async def upload_audio(
     file: UploadFile = File(...),
-    x_user_id: str = Form("user_id"),
+    user_id: str = Form(...),
     speaker_gender: str = Form("speaker_gender"),
     speaker_age: str = Form("speaker_age"),
     question: str = Form("question"),
@@ -16,5 +16,5 @@ async def upload_audio(
     db: AsyncSession = Depends(get_db)
 
 ):
-    response = await process_audio_file(file, x_user_id, speaker_gender, speaker_age,question,description,db)
+    response = await process_audio_file(file, user_id, speaker_gender, speaker_age,question,description,db)
     return response
