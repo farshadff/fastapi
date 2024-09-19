@@ -71,7 +71,21 @@ class Fluency(Base):
     feedback_text = Column(Text)
     speech_rate_over_time = Column(JSON)
     filler_words_per_min = Column(Float)
-
+    # New fields added
+    tagged_transcript = Column(Text)
+    filler_words_feedback_text = Column(Text)
+    filler_words_feedback_code = Column(String(20))
+    pauses_feedback_text = Column(Text)
+    pauses_feedback_code = Column(String(20))
+    speech_rate_feedback_text = Column(Text)
+    speech_rate_feedback_code = Column(String(20))
+    mock_cefr_prediction = Column(String(10))
+    mock_ielts_prediction = Column(Float)
+    discourse_markers = Column(JSON)
+    filler_words_details = Column(JSON)
+    repetitions = Column(JSON)
+    pause_details = Column(JSON)
+    warnings = Column(JSON)
     # Relationship
     main_response = relationship("MainResponse", back_populates="fluency")
 

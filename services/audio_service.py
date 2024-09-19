@@ -107,15 +107,35 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
 
         # Store fluency details if they exist
         if 'fluency' in result_data:
+            fluency_data = result_data['fluency']
+            feedback = fluency_data.get('feedback', {})
+            metrics = fluency_data.get('metrics', {})
+            english_scores = fluency_data.get('english_proficiency_scores', {})
+            warnings = fluency_data.get('warnings', {})
+
             fluency = Fluency(
                 response_id=response_id,
-                overall_score=result_data['fluency'].get('overall_score', None),
-                speech_rate=result_data['fluency'].get('metrics', {}).get('speech_rate', None),
-                pauses=result_data['fluency'].get('metrics', {}).get('pauses', None),
-                filler_words=result_data['fluency'].get('metrics', {}).get('filler_words', None),
-                feedback_text=result_data['fluency'].get('feedback', {}).get('feedback_text', None),
-                speech_rate_over_time=result_data['fluency'].get('metrics', {}).get('speech_rate_over_time', None),
-                filler_words_per_min=result_data['fluency'].get('metrics', {}).get('filler_words_per_min', None)
+                overall_score=fluency_data.get('overall_score', None),
+                speech_rate=metrics.get('speech_rate', None),
+                pauses=metrics.get('pauses', None),
+                filler_words=metrics.get('filler_words', None),
+                feedback_text=feedback.get('feedback_text', None),
+                speech_rate_over_time=metrics.get('speech_rate_over_time', None),
+                filler_words_per_min=metrics.get('filler_words_per_min', None),
+                tagged_transcript=feedback.get('tagged_transcript', None),
+                filler_words_feedback_text=feedback.get('filler_words', {}).get('feedback_text', None),
+                filler_words_feedback_code=feedback.get('filler_words', {}).get('feedback_code', None),
+                pauses_feedback_text=feedback.get('pauses', {}).get('feedback_text', None),
+                pauses_feedback_code=feedback.get('pauses', {}).get('feedback_code', None),
+                speech_rate_feedback_text=feedback.get('speech_rate', {}).get('feedback_text', None),
+                speech_rate_feedback_code=feedback.get('speech_rate', {}).get('feedback_code', None),
+                mock_cefr_prediction=english_scores.get('mock_cefr', {}).get('prediction', None),
+                mock_ielts_prediction=english_scores.get('mock_ielts', {}).get('prediction', None),
+                discourse_markers=metrics.get('discourse_markers', []),
+                filler_words_details=metrics.get('filler_words_details', []),
+                repetitions=metrics.get('repetitions', []),
+                pause_details=metrics.get('pause_details', []),
+                warnings=warnings
             )
             db.add(fluency)
 
