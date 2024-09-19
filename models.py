@@ -49,6 +49,8 @@ class Pronunciation(Base):
     response_id = Column(Integer, ForeignKey('lang_ai_main_response.id'))
     overall_score = Column(Float)
     lowest_scoring_phonemes = Column(JSON)
+    mock_cefr_prediction = Column(String, nullable=True)  # New column for storing the mock CEFR score
+    mock_ielts_prediction = Column(Float, nullable=True)  # New column for storing the mock IELTS score
 
     # Relationship
     main_response = relationship("MainResponse", back_populates="pronunciation")

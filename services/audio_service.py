@@ -90,7 +90,15 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
             pronunciation = Pronunciation(
                 response_id=response_id,
                 overall_score=result_data['pronunciation'].get('overall_score', None),
-                lowest_scoring_phonemes=result_data['pronunciation'].get('lowest_scoring_phonemes', None)
+                lowest_scoring_phonemes=result_data['pronunciation'].get('lowest_scoring_phonemes', None),
+                mock_cefr_prediction=result_data['pronunciation'].get('english_proficiency_scores', {}).get('mock_cefr',
+                                                                                                            {}).get(
+                    'prediction', None),  # Extract and store mock_cefr
+                mock_ielts_prediction=result_data['pronunciation'].get('english_proficiency_scores', {}).get(
+                    'mock_ielts',
+                    {}).get(
+                    'prediction', None)  # Extract and store mock_ielts
+
             )
             db.add(pronunciation)
 
@@ -138,4 +146,4 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
                 )
                 db.add(word_entry)
 
-    return {"message": "Result stored successfully", "response_id": response_id,"response_datax":result_data}
+    return {"message": "Result stored successfully", "response_id": response_id, "response_datax": result_data}
