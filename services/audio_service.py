@@ -78,6 +78,9 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
         user_id=x_user_id,
         question=question,
         description=description,
+        predicted_text=result_data.get('metadata', {}).get('predicted_text', None),
+        content_relevance=result_data.get('metadata', {}).get('content_relevance', None),
+        content_relevance_feedback=result_data.get('metadata', {}).get('content_relevance_feedback', None)
     )
 
     async with db.begin():
@@ -122,16 +125,32 @@ async def process_audio_file(file: UploadFile, x_user_id: str, speaker_gender: s
                 response_id=response_id,
                 overall_score=result_data['vocabulary'].get('overall_score', None),
                 vocabulary_complexity=result_data['vocabulary'].get('metrics', {}).get('vocabulary_complexity', None),
-                feedback_text=result_data['vocabulary'].get('feedback', {}).get('feedback_text', None)
+                feedback_text=result_data['vocabulary'].get('feedback', {}).get('feedback_text', None),
+                feedback_tagged_transcript=result_data['vocabulary'].get('feedback', {}).get('tagged_transcript', None),
+                mock_cefr_prediction=result_data['vocabulary'].get('english_proficiency_scores', {}).get('mock_cefr',
+                                                                                                         {}).get(
+                    'prediction', None),
+                mock_ielts_prediction=result_data['vocabulary'].get('english_proficiency_scores', {}).get('mock_ielts',
+                                                                                                          {}).get(
+                    'prediction', None),
+                idiom_details=result_data['vocabulary'].get('metrics', {}).get('idiom_details', [])
             )
             db.add(vocabulary)
 
         # Store grammar details if they exist
         if 'grammar' in result_data:
+            grammar_data = result_data['grammar']
+
             grammar = Grammar(
                 response_id=response_id,
                 overall_score=result_data['grammar'].get('overall_score', None),
-                feedback_text=json.dumps(result_data['grammar'].get('feedback', {}))
+                feedback_text=json.dumps(result_data['grammar'].get('feedback', {})),
+                mistake_count=grammar_data.get('metrics', {}).get('mistake_count', None),
+                grammatical_complexity=grammar_data.get('metrics', {}).get('grammatical_complexity', None),
+                mock_cefr_prediction=grammar_data.get('english_proficiency_scores', {}).get('mock_cefr', {}).get(
+                    'prediction', None),
+                mock_ielts_prediction=grammar_data.get('english_proficiency_scores', {}).get('mock_ielts', {}).get(
+                    'prediction', None)
             )
             db.add(grammar)
 

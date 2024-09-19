@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, Text, DateTime, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from database import Base
 import datetime
@@ -33,7 +34,9 @@ class MainResponse(Base):
     user_id = Column(Text)
     question = Column(Text)
     description = Column(Text)
-
+    predicted_text = Column(Text)
+    content_relevance = Column(String)
+    content_relevance_feedback = Column(Text)
     # Relationships
     pronunciation = relationship("Pronunciation", back_populates="main_response", cascade="all, delete-orphan")
     fluency = relationship("Fluency", back_populates="main_response", cascade="all, delete-orphan")
@@ -81,7 +84,10 @@ class Vocabulary(Base):
     overall_score = Column(Float)
     vocabulary_complexity = Column(String(50))
     feedback_text = Column(Text)
-
+    feedback_tagged_transcript = Column(Text)
+    mock_cefr_prediction = Column(String)
+    mock_ielts_prediction = Column(Float)
+    idiom_details = Column(JSONB)
     # Relationship
     main_response = relationship("MainResponse", back_populates="vocabulary")
 
@@ -93,7 +99,10 @@ class Grammar(Base):
     response_id = Column(Integer, ForeignKey('lang_ai_main_response.id'))
     overall_score = Column(Float)
     feedback_text = Column(Text)
-
+    mistake_count = Column(Integer)
+    grammatical_complexity = Column(String)
+    mock_cefr_prediction = Column(String)
+    mock_ielts_prediction = Column(Float)
     # Relationship
     main_response = relationship("MainResponse", back_populates="grammar")
 
