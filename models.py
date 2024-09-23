@@ -142,8 +142,9 @@ class PronunciationResponse(Base):
     mock_pte_prediction = Column(Integer, nullable=True)
     lowest_scoring_phonemes = Column(JSON, nullable=True)
     warnings = Column(JSON, nullable=True)
-    response_id = Column(Integer, ForeignKey("main_responses.id"), nullable=False)
+    response_id = Column(Integer, nullable=False)  # ForeignKey removed
     words = relationship("WordDetails", back_populates="pronunciation_response")
+
 
 class WordDetails(Base):
     __tablename__ = "word_details"
