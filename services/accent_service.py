@@ -3,7 +3,7 @@ from fastapi import Request, UploadFile, APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import MainResponse, PronunciationResponse, WordDetails
+# from models import MainResponse, PronunciationResponse, WordDetails
 import base64
 from database import database as db
 import requests
