@@ -48,7 +48,7 @@ async def process_accent_file(
 
     response = requests.post(url, json=payload, headers=headers)
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail="Error calling pronunciation service")
+        raise HTTPException(status_code=response.status_code, detail=response)
 
     result_data = response.json()
 
