@@ -61,10 +61,10 @@ async def process_accent_file(
     result_data = response.json()
 
     # Store the response in the database
-    # pronunciation_response_id = await store_pronunciation_response(result_data, db)
+    pronunciation_response_id = await store_pronunciation_response(result_data, db)
 
     return {"message": "Result stored successfully", "response_datax": result_data,
-            "pronunciation_response_id": 1}
+            "pronunciation_response_id": pronunciation_response_id}
 
 
 async def store_pronunciation_response(result_data: dict, db: AsyncSession) -> int:
