@@ -51,4 +51,4 @@ async def process_accent_file(file: UploadFile, x_user_id: str, speaker_gender: 
     print(result_data)
     # Handle base64 processing error
 
-    return {"message": "Result stored successfully", "response_id": response_id, "response_datax": result_data}
+    return {"message": "Result stored successfully", "response_datax": result_data}
