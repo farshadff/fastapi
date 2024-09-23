@@ -143,7 +143,6 @@ class PronunciationResponse(Base):
     lowest_scoring_phonemes = Column(JSON, nullable=True)
     warnings = Column(JSON, nullable=True)
     response_id = Column(Integer, nullable=False)  # ForeignKey removed
-    words = relationship("WordDetails", back_populates="pronunciation_response")
 
 
 class WordDetails(Base):
@@ -152,5 +151,4 @@ class WordDetails(Base):
     word_text = Column(String, nullable=False)
     word_score = Column(Float, nullable=False)
     phonemes = Column(JSON, nullable=False)
-    pronunciation_response_id = Column(Integer, ForeignKey("pronunciation_responses.id"), nullable=False)
-    pronunciation_response = relationship("PronunciationResponse", back_populates="words")
+    pronunciation_response_id = Column(Integer, nullable=False)
