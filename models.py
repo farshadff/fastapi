@@ -132,3 +132,24 @@ class Words(Base):
 
     # Relationship
     main_response = relationship("MainResponse", back_populates="words")
+class PronunciationResponse(Base):
+    __tablename__ = "pronunciation_responses"
+    id = Column(Integer, primary_key=True, index=True)
+    overall_score = Column(Float, nullable=False)
+    expected_text = Column(String, nullable=False)
+    mock_ielts_prediction = Column(Float, nullable=True)
+    mock_cefr_prediction = Column(String, nullable=True)
+    mock_pte_prediction = Column(Integer, nullable=True)
+    lowest_scoring_phonemes = Column(JSON, nullable=True)
+    warnings = Column(JSON, nullable=True)
+    response_id = Column(Integer, ForeignKey("main_responses.id"), nullable=False)
+    words = relationship("WordDetails", back_populates="pronunciation_response")
+
+class WordDetails(Base):
+    __tablename__ = "word_details"
+    id = Column(Integer, primary_key=True, index=True)
+    word_text = Column(String, nullable=False)
+    word_score = Column(Float, nullable=False)
+    phonemes = Column(JSON, nullable=False)
+    pronunciation_response_id = Column(Integer, ForeignKey("pronunciation_responses.id"), nullable=False)
+    pronunciation_response = relationship("PronunciationResponse", back_populates="words")

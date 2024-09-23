@@ -8,6 +8,8 @@ import base64
 from database import database as db
 import requests
 
+from models import PronunciationResponse, WordDetails
+
 router = APIRouter()
 
 
@@ -65,34 +67,34 @@ async def process_accent_file(
             "pronunciation_response_id": 1}
 
 
-# async def store_pronunciation_response(result_data: dict, db: AsyncSession) -> int:
-#     """Store pronunciation response and related word details in the database."""
-#
-#     pronunciation_response = PronunciationResponse(
-#         overall_score=result_data.get("overall_score", 0.0),
-#         expected_text=result_data.get("expected_text", ""),
-#         mock_ielts_prediction=result_data.get("english_proficiency_scores", {}).get("mock_ielts", {}).get("prediction",
-#                                                                                                           None),
-#         mock_cefr_prediction=result_data.get("english_proficiency_scores", {}).get("mock_cefr", {}).get("prediction",
-#                                                                                                         None),
-#         mock_pte_prediction=result_data.get("english_proficiency_scores", {}).get("mock_pte", {}).get("prediction",
-#                                                                                                       None),
-#         lowest_scoring_phonemes=result_data.get("lowest_scoring_phonemes", []),
-#         warnings=result_data.get("warnings", {})
-#     )
-#
-#     async with db.begin():
-#         db.add(pronunciation_response)
-#         await db.flush()  # to get the id of the inserted row
-#
-#         # Store word details
-#         for word_data in result_data.get("words", []):
-#             word_details = WordDetails(
-#                 word_text=word_data.get("word_text", ""),
-#                 word_score=word_data.get("word_score", 0.0),
-#                 phonemes=word_data.get("phonemes", []),
-#                 pronunciation_response_id=pronunciation_response.id
-#             )
-#             db.add(word_details)
-#
-#     return pronunciation_response.id
+async def store_pronunciation_response(result_data: dict, db: AsyncSession) -> int:
+    """Store pronunciation response and related word details in the database."""
+
+    pronunciation_response = PronunciationResponse(
+        overall_score=result_data.get("overall_score", 0.0),
+        expected_text=result_data.get("expected_text", ""),
+        mock_ielts_prediction=result_data.get("english_proficiency_scores", {}).get("mock_ielts", {}).get("prediction",
+                                                                                                          None),
+        mock_cefr_prediction=result_data.get("english_proficiency_scores", {}).get("mock_cefr", {}).get("prediction",
+                                                                                                        None),
+        mock_pte_prediction=result_data.get("english_proficiency_scores", {}).get("mock_pte", {}).get("prediction",
+                                                                                                      None),
+        lowest_scoring_phonemes=result_data.get("lowest_scoring_phonemes", []),
+        warnings=result_data.get("warnings", {})
+    )
+
+    async with db.begin():
+        db.add(pronunciation_response)
+        await db.flush()  # to get the id of the inserted row
+
+        # Store word details
+        for word_data in result_data.get("words", []):
+            word_details = WordDetails(
+                word_text=word_data.get("word_text", ""),
+                word_score=word_data.get("word_score", 0.0),
+                phonemes=word_data.get("phonemes", []),
+                pronunciation_response_id=pronunciation_response.id
+            )
+            db.add(word_details)
+
+    return pronunciation_response.id
