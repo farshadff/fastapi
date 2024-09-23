@@ -32,7 +32,7 @@ async def process_accent_file(file: UploadFile, x_user_id: str, speaker_gender: 
     url = "https://apis.languageconfidence.ai/pronunciation/us"
     payload = {
         "audio_format": "wav",
-        "expected_text": "test",
+        "expected_text": "hello world",
         "user_metadata": {
             "speaker_gender": speaker_gender,
             "speaker_age": speaker_age
