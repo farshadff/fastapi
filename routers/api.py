@@ -24,15 +24,16 @@ async def upload_audio(
 
 
 @router.post("/accent-service/")
-async def upload_audio(
+async def upload_accent_audio(
         file: UploadFile = File(...),
         user_id: str = Form(...),
         speaker_gender: str = Form("speaker_gender"),
         speaker_age: str = Form("speaker_age"),
         question: str = Form("question"),
         description: str = Form("description"),
+        expected_text: str = Form(...),  # New parameter to accept expected text from the user
         db: AsyncSession = Depends(get_db)
 
 ):
-    response = await process_accent_file(file, user_id, speaker_gender, speaker_age, question, description, db)
+    response = await process_accent_file(file, user_id, speaker_gender, speaker_age, question, description,expected_text, db)
     return response
